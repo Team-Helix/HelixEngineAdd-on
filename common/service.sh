@@ -60,30 +60,6 @@ else
 	echo 80000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/boostpulse_duration
 	echo 0 > /sys/devices/system/cpu/cpufreq/policy4/interactive/io_is_busy
 	echo 0 > /sys/devices/system/cpu/cpufreq/policy4/interactive/enable_prediction
-	#HMP tunables
-	echo 65 > /proc/sys/kernel/sched_downmigrate
-	echo 75 > /proc/sys/kernel/sched_group_downmigrate
-	echo 85 > /proc/sys/kernel/sched_upmigrate
-	echo 95 > /proc/sys/kernel/sched_group_upmigrate
-	echo 10 > /proc/sys/kernel/sched_small_wakee_task_load
-	echo 0 > /proc/sys/kernel/sched_init_task_load
-	echo 1 > /proc/sys/kernel/sched_enable_power_aware
-	echo 1 > /proc/sys/kernel/sched_enable_thread_grouping
-	echo 30 > /proc/sys/kernel/sched_big_waker_task_load
-	echo 3 > /proc/sys/kernel/sched_window_stats_policy
-	echo 5 > /proc/sys/kernel/sched_ravg_hist_size
-	echo 7 > /proc/sys/kernel/sched_spill_nr_run
-	echo 90 > /proc/sys/kernel/sched_spill_load
-	echo 1 > /proc/sys/kernel/sched_enable_thread_grouping
-	echo 1 > /proc/sys/kernel/sched_restrict_cluster_spill
-	echo 110 > /proc/sys/kernel/sched_wakeup_load_threshold
-	echo 10 > /proc/sys/kernel/sched_rr_timeslice_ms
-	echo 1 > /proc/sys/kernel/sched_enable_power_aware
-	echo 1 > /proc/sys/kernel/sched_migration_fixup
-	echo 0 > /proc/sys/kernel/sched_autogroup_enabled
-	echo 200000 > /proc/sys/kernel/sched_freq_inc_notify
-	echo 400000 > /proc/sys/kernel/sched_freq_dec_notify
-	echo 1000 > /proc/sys/kernel/sched_select_prev_cpu_us
 fi
 
 #I/0
