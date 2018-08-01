@@ -1,3 +1,3 @@
-# build.prop module
+# HelixEngine Add-on
 
-Adds some build.prop values.
+Runs some tweaks which are not handled but Helix Engine itself (yet).
