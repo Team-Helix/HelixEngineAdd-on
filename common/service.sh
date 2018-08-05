@@ -18,6 +18,7 @@ echo 0 > /proc/sys/kernel/sched_child_runs_first
 echo 0 > /dev/stune/background/schedtune.prefer_idle
 echo 1 > /dev/stune/foreground/schedtune.prefer_idle
 echo 1 > /dev/stune/top-app/schedtune.prefer_idle
+echo 1000 > /proc/sys/kernel/sched_select_prev_cpu_us
 
 #Governor
 if grep 'schedutil' /sys/devices/system/cpu/cpufreq/policy0/scaling_available_governors; then
@@ -30,11 +31,11 @@ if grep 'schedutil' /sys/devices/system/cpu/cpufreq/policy0/scaling_available_go
 	echo 5000 > /sys/devices/system/cpu/cpufreq/policy4/schedutil/down_rate_limit_us
 	echo 1 > /sys/devices/system/cpu/cpufreq/policy4/schedutil/iowait_boost_enable
 else
-	if [ grep 'msm8998' /system/build.prop ] || [ grep 'msm8998' /vendor/build.prop ] ; then
+	if  grep "msm8998" /system/build.prop || grep "msm8998" /vendor/build.prop; then
 		#LITTLE
 		echo 82 883200:85 1171200:87 1324800:91 1555200:95 > /sys/devices/system/cpu/cpufreq/policy0/interactive/target_loads
 		echo 90000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/timer_slack
-		echo 25000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/timer_rate
+		echo 30000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/timer_rate
 		echo 1248000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/hispeed_freq
 		echo 0 883200:20000 1555200:40000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/above_hispeed_delay
 		echo 400 > /sys/devices/system/cpu/cpufreq/policy0/interactive/go_hispeed_load
@@ -50,7 +51,7 @@ else
 		echo 84 979200:86 1344000:88 1574400:91 1804800:95 > /sys/devices/system/cpu/cpufreq/policy4/interactive/target_loads
 		echo 90000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/timer_slack
 		echo 1574400 > /sys/devices/system/cpu/cpufreq/policy4/interactive/hispeed_freq
-		echo 25000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/timer_rate
+		echo 30000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/timer_rate
 		echo 0 979200:20000 1574400:40000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/above_hispeed_delay
 		echo 400 > /sys/devices/system/cpu/cpufreq/policy4/interactive/go_hispeed_load
 		echo 20000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/min_sample_time
@@ -61,13 +62,13 @@ else
 		echo 80000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/boostpulse_duration
 		echo 0 > /sys/devices/system/cpu/cpufreq/policy4/interactive/io_is_busy
 		echo 0 > /sys/devices/system/cpu/cpufreq/policy4/interactive/enable_prediction
-	elif [ grep 'msm8996' /system/build.prop ] || [ grep 'msm8996' /vendor/build.prop ] ; then
+	elif grep "msm8996" /system/build.prop || grep "msm8996" /vendor/build.prop; then
 		#LITTLE
 		echo 76 729600:81 844800:84 1228800:86 1324800:92 1478400:99 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/target_loads
 		echo 90000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/timer_slack
 		echo 1228800 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/hispeed_freq
 		echo 20000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/timer_rate
-		echo 0 652800:40000 1111300:80000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/above_hispeed_delay
+		echo 0 844800:40000 1228800:60000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/above_hispeed_delay
 		echo 400 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/go_hispeed_load
 		echo 10000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/min_sample_time	
 		echo 0 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/max_freq_hysteresis
@@ -78,7 +79,7 @@ else
 		echo 90000 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/timer_slack
 		echo 1248000 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/hispeed_freq
 		echo 30000 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/timer_rate
-		echo 0 652800:60000 1248000:80000 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/above_hispeed_delay
+		echo 0 1248000:60000 1324800:80000 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/above_hispeed_delay
 		echo 400 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/go_hispeed_load
 		echo 25000 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/min_sample_time	
 		echo 0 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/min_sample_time		
@@ -88,8 +89,7 @@ else
 		echo 0 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/boostpulse_duration
 	else
 		echo "Do nothing for now" > /storage/emulated/0/log.txt
-	fi	
-	echo 1000 > /proc/sys/kernel/sched_select_prev_cpu_us
+	fi
 fi
 
 #Touchboost
