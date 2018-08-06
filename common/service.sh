@@ -87,8 +87,68 @@ else
 		echo 0 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/boost
 		echo 1 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/use_sched_load
 		echo 0 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/boostpulse_duration
+		elif grep "msm8994" /system/build.prop;then
+		#LITTLE
+		echo 76 600000:40 672000:58 768000:82 960000:89 1248000:94  1478000:99 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/target_loads
+		echo 356940 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/timer_slack
+		echo 600000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/hispeed_freq
+		echo 20000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/timer_rate
+		echo 20000 460000:0 600000:60000 960000:100000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/above_hispeed_delay
+		echo 400 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/go_hispeed_load
+		echo 0 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/min_sample_time
+		echo 0 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/max_freq_hysteresis
+		echo 1 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/ignore_hispeed_on_notif
+		echo 0 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/boost
+		echo 0 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/fast_ramp_down
+		echo 0 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/align_windows
+		echo 1 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/use_migration_notif
+		echo 1 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/use_sched_load
+		echo 0 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/boostpulse_duration
+		#big
+		echo 76 633000:48 768000:57 1248000:74 1440000:86 1958400:99 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/target_loads
+		echo 178470 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/timer_slack
+		echo 1958400 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/hispeed_freq
+		echo 20000 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/timer_rate
+		echo 10000 1440000:120000 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/above_hispeed_delay
+		echo 400 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/go_hispeed_load
+		echo 0 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/min_sample_time
+		echo 0 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/max_freq_hysteresis
+		echo 1 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/ignore_hispeed_on_notif
+		echo 0 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/boost
+		echo 1 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/fast_ramp_down
+		echo 0 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/align_windows
+		echo 1 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/use_migration_notif
+		echo 1 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/use_sched_load
+		echo 0 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/boostpulse_duration
+	elif grep "msm8992" /system/build.prop;then
+		#LITTLE
+		echo 76 672000:58 787200:82 960000:89 1248000:99 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/target_loads
+		echo 356940 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/timer_slack
+		echo 600000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/hispeed_freq
+		echo 20000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/timer_rate
+		echo 20000 460000:0 600000:60000 672000:100000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/above_hispeed_delay
+		echo 400 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/go_hispeed_load
+		echo 0 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/min_sample_time
+		echo 0 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/max_freq_hysteresis
+		echo 0 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/boost
+		echo 0 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/fast_ramp_down
+		echo 1 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/use_sched_load
+		echo 0 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/boostpulse_duration
+		#big
+		echo 76 768000:57 1248000:74 1440000:86 1824000:99 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/target_loads
+		echo 178470 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/timer_slack
+		echo 1824000 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/hispeed_freq
+		echo 20000 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/timer_rate
+		echo 10000 1440000:120000 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/above_hispeed_delay
+		echo 400 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/go_hispeed_load
+		echo 0 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/min_sample_time
+		echo 0 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/max_freq_hysteresis
+		echo 0 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/boost
+		echo 1 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/fast_ramp_down
+		echo 1 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/use_sched_load
+		echo 0 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/boostpulse_duration
 	else
-		echo "Do nothing for now" > /storage/emulated/0/log.txt
+		echo "More chipsets will be supported in some future" > /storage/emulated/0/log.txt
 	fi
 fi
 
@@ -121,6 +181,12 @@ echo 1 > /proc/sys/net/ipv4/tcp_window_scaling
 
 #WQ
 echo Y > /sys/module/workqueue/parameters/power_efficient
+
+## FS, if on eMMC storage
+echo 10 > /proc/sys/fs/lease-break-time
+echo 32768 > /proc/sys/fs/inotify/max_queued_events
+echo 256 > /proc/sys/fs/inotify/max_user_instances
+echo 16384 > /proc/sys/fs/inotify/max_user_watches
 
 #LMK
 chown root /sys/module/lowmemorykiller/parameters/enable_adaptive_lmk
