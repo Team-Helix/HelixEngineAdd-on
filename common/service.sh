@@ -31,7 +31,7 @@ if grep 'schedutil' /sys/devices/system/cpu/cpufreq/policy0/scaling_available_go
 	echo 5000 > /sys/devices/system/cpu/cpufreq/policy4/schedutil/down_rate_limit_us
 	echo 1 > /sys/devices/system/cpu/cpufreq/policy4/schedutil/iowait_boost_enable
 else
-	if  grep "msm8998" /system/build.prop || grep "msm8998" /vendor/build.prop; then
+	if grep "msm8998" /system/build.prop || grep "msm8998" /vendor/build.prop; then
 		#LITTLE
 		echo 82 883200:85 1171200:87 1324800:91 1555200:95 > /sys/devices/system/cpu/cpufreq/policy0/interactive/target_loads
 		echo 90000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/timer_slack
@@ -87,7 +87,7 @@ else
 		echo 0 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/boost
 		echo 1 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/use_sched_load
 		echo 0 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/boostpulse_duration
-		elif grep "msm8994" /system/build.prop;then
+	elif grep "msm8994" /system/build.prop;then
 		#LITTLE
 		echo 76 600000:40 672000:58 768000:82 960000:89 1248000:94  1478000:99 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/target_loads
 		echo 356940 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/timer_slack
@@ -148,7 +148,7 @@ else
 		echo 1 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/use_sched_load
 		echo 0 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/boostpulse_duration
 	else
-		echo "More chipsets will be supported in some future" > /storage/emulated/0/log.txt
+		echo 0 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/boost
 	fi
 fi
 
