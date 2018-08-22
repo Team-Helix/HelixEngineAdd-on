@@ -20,9 +20,9 @@ if grep "schedutil" /sys/devices/system/cpu/cpufreq/policy0/scaling_available_go
 else
 	if grep "msm8998" /system/build.prop || grep "msm8998" /vendor/build.prop; then
 		#LITTLE
-		echo 82 883200:85 1171200:87 1324800:91 1555200:95 > /sys/devices/system/cpu/cpufreq/policy0/interactive/target_loads
+		echo 83 883200:85 1171200:87 1324800:91 1555200:95 > /sys/devices/system/cpu/cpufreq/policy0/interactive/target_loads
 		echo 90000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/timer_slack
-		echo 20000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/timer_rate
+		echo 26666 > /sys/devices/system/cpu/cpufreq/policy0/interactive/timer_rate
 		echo 1248000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/hispeed_freq
 		echo 0 1056000:20000 1248000:40000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/above_hispeed_delay
 		echo 400 > /sys/devices/system/cpu/cpufreq/policy0/interactive/go_hispeed_load
@@ -35,7 +35,7 @@ else
 		echo 0 > /sys/devices/system/cpu/cpufreq/policy0/interactive/io_is_busy
 		echo 0 > /sys/devices/system/cpu/cpufreq/policy0/interactive/enable_prediction
 		#big
-		echo 83 979200:86 1344000:88 1574400:91 1804800:95 > /sys/devices/system/cpu/cpufreq/policy4/interactive/target_loads
+		echo 84 979200:86 1344000:88 1574400:91 1804800:95 > /sys/devices/system/cpu/cpufreq/policy4/interactive/target_loads
 		echo 90000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/timer_slack
 		echo 1574400 > /sys/devices/system/cpu/cpufreq/policy4/interactive/hispeed_freq
 		echo 26666 > /sys/devices/system/cpu/cpufreq/policy4/interactive/timer_rate
@@ -169,7 +169,7 @@ echo 1 > /proc/sys/net/ipv4/tcp_window_scaling
 #WQ
 echo Y > /sys/module/workqueue/parameters/power_efficient
 
-## FS, if on eMMC storage
+##FS
 echo 10 > /proc/sys/fs/lease-break-time
 echo 32768 > /proc/sys/fs/inotify/max_queued_events
 echo 256 > /proc/sys/fs/inotify/max_user_instances
