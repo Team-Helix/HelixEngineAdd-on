@@ -1,7 +1,7 @@
 id=helixEngineAddOn
 name=HelixEngine Add-on
-version=v3
-versionCode=2
+version=v4
+versionCode=1
 author=RogerF81
 description=Runs some further tweaks for HelixEngine (mainly for SD835 and SD820 for now).
 minMagisk=1500

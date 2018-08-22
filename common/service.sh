@@ -5,23 +5,10 @@ MODDIR=${0%/*}
 
 # This script will be executed in late_start service mode
 # More info in the main Magisk thread
-#!/system/bin/sh
-# AUTHOR: TEAM HELIX @ XDA-DEVELOPERS
-# Template by @ZeroInfinity, adapted from @RogerF81, improved by @Asiier
-# Helix-Engine profile script: Balanced
-
-stop perfd
-
-#Stune
-echo 0 > /dev/stune/schedtune.prefer_idle
-echo 0 > /proc/sys/kernel/sched_child_runs_first
-echo 0 > /dev/stune/background/schedtune.prefer_idle
-echo 1 > /dev/stune/foreground/schedtune.prefer_idle
-echo 1 > /dev/stune/top-app/schedtune.prefer_idle
-echo 1000 > /proc/sys/kernel/sched_select_prev_cpu_us
+sleep 20
 
 #Governor
-if grep 'schedutil' /sys/devices/system/cpu/cpufreq/policy0/scaling_available_governors; then
+if grep "schedutil" /sys/devices/system/cpu/cpufreq/policy0/scaling_available_governors; then
 	#LITTLE
 	echo 1000 > /sys/devices/system/cpu/cpufreq/policy0/schedutil/up_rate_limit_us
 	echo 5000 > /sys/devices/system/cpu/cpufreq/policy0/schedutil/down_rate_limit_us
@@ -35,11 +22,11 @@ else
 		#LITTLE
 		echo 82 883200:85 1171200:87 1324800:91 1555200:95 > /sys/devices/system/cpu/cpufreq/policy0/interactive/target_loads
 		echo 90000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/timer_slack
-		echo 30000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/timer_rate
+		echo 20000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/timer_rate
 		echo 1248000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/hispeed_freq
-		echo 0 883200:20000 1555200:40000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/above_hispeed_delay
+		echo 0 1056000:20000 1248000:40000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/above_hispeed_delay
 		echo 400 > /sys/devices/system/cpu/cpufreq/policy0/interactive/go_hispeed_load
-		echo 20000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/min_sample_time
+		echo 19000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/min_sample_time
 		echo 79000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/max_freq_hysteresis
 		echo 0 > /sys/devices/system/cpu/cpufreq/policy0/interactive/boost
 		echo 0 > /sys/devices/system/cpu/cpufreq/policy0/interactive/fast_ramp_down
@@ -48,16 +35,16 @@ else
 		echo 0 > /sys/devices/system/cpu/cpufreq/policy0/interactive/io_is_busy
 		echo 0 > /sys/devices/system/cpu/cpufreq/policy0/interactive/enable_prediction
 		#big
-		echo 84 979200:86 1344000:88 1574400:91 1804800:95 > /sys/devices/system/cpu/cpufreq/policy4/interactive/target_loads
+		echo 83 979200:86 1344000:88 1574400:91 1804800:95 > /sys/devices/system/cpu/cpufreq/policy4/interactive/target_loads
 		echo 90000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/timer_slack
 		echo 1574400 > /sys/devices/system/cpu/cpufreq/policy4/interactive/hispeed_freq
-		echo 30000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/timer_rate
-		echo 0 979200:20000 1574400:40000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/above_hispeed_delay
+		echo 26666 > /sys/devices/system/cpu/cpufreq/policy4/interactive/timer_rate
+		echo 0 1056000:20000 1574400:60000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/above_hispeed_delay
 		echo 400 > /sys/devices/system/cpu/cpufreq/policy4/interactive/go_hispeed_load
-		echo 20000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/min_sample_time
+		echo 19000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/min_sample_time
 		echo 79000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/max_freq_hysteresis
 		echo 0 > /sys/devices/system/cpu/cpufreq/policy4/interactive/boost
-		echo 0 > /sys/devices/system/cpu/cpufreq/policy4/interactive/fast_ramp_down
+		echo 1 > /sys/devices/system/cpu/cpufreq/policy4/interactive/fast_ramp_down
 		echo 1 > /sys/devices/system/cpu/cpufreq/policy4/interactive/use_sched_load
 		echo 80000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/boostpulse_duration
 		echo 0 > /sys/devices/system/cpu/cpufreq/policy4/interactive/io_is_busy
@@ -158,7 +145,7 @@ echo 0 > /sys/power/pnpmgr/touch_boost
 
 #I/0
 echo "cfq" > /sys/block/sda/queue/scheduler
-echo 1024 > /sys/block/sda/queue/read_ahead_kb
+echo 1536 > /sys/block/sda/queue/read_ahead_kb
 echo 128 > /sys/block/sda/queue/nr_requests
 echo 0 > /sys/block/sda/queue/add_random
 echo 0 > /sys/block/sda/queue/iostats
@@ -191,7 +178,7 @@ echo 16384 > /proc/sys/fs/inotify/max_user_watches
 #LMK
 chown root /sys/module/lowmemorykiller/parameters/enable_adaptive_lmk
 echo 0 > /sys/module/lowmemorykiller/parameters/enable_adaptive_lmk
-if grep 'OnePlus' /system/build.prop; then
+if grep "OnePlus" /system/build.prop; then
 	echo "12288,15360,18432,21504,36864,53760" > /sys/module/lowmemorykiller/parameters/minfree
 else
 	echo "18432,23040,27648,32256,64512,94080" > /sys/module/lowmemorykiller/parameters/minfree
@@ -228,7 +215,7 @@ echo 15 > /proc/sys/vm/dirty_ratio
 echo 10 > /proc/sys/vm/dirty_background_ratio
 echo 0 > /proc/sys/vm/overcommit_memory
 echo 80 > /proc/sys/vm/overcommit_ratio
-if grep 'OnePlus' /system/build.prop; then
+if grep "OnePlus" /system/build.prop; then
 	echo 20480 > /proc/sys/vm/min_free_kbytes
 else
 	echo 10240 > /proc/sys/vm/min_free_kbytes
