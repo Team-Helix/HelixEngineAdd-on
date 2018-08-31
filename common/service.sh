@@ -22,31 +22,31 @@ else
 		#LITTLE
 		echo 83 883200:85 1171200:87 1324800:91 1555200:95 > /sys/devices/system/cpu/cpufreq/policy0/interactive/target_loads
 		echo 90000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/timer_slack
-		echo 26666 > /sys/devices/system/cpu/cpufreq/policy0/interactive/timer_rate
+		echo 16666 > /sys/devices/system/cpu/cpufreq/policy0/interactive/timer_rate
 		echo 1248000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/hispeed_freq
 		echo 0 1056000:20000 1248000:40000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/above_hispeed_delay
 		echo 400 > /sys/devices/system/cpu/cpufreq/policy0/interactive/go_hispeed_load
-		echo 19000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/min_sample_time
-		echo 79000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/max_freq_hysteresis
+		echo 10000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/min_sample_time
+		echo 70000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/max_freq_hysteresis
 		echo 0 > /sys/devices/system/cpu/cpufreq/policy0/interactive/boost
 		echo 0 > /sys/devices/system/cpu/cpufreq/policy0/interactive/fast_ramp_down
 		echo 1 > /sys/devices/system/cpu/cpufreq/policy0/interactive/use_sched_load
-		echo 80000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/boostpulse_duration
+		echo 50000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/boostpulse_duration
 		echo 0 > /sys/devices/system/cpu/cpufreq/policy0/interactive/io_is_busy
 		echo 0 > /sys/devices/system/cpu/cpufreq/policy0/interactive/enable_prediction
 		#big
 		echo 84 979200:86 1344000:88 1574400:91 1804800:95 > /sys/devices/system/cpu/cpufreq/policy4/interactive/target_loads
 		echo 90000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/timer_slack
 		echo 1574400 > /sys/devices/system/cpu/cpufreq/policy4/interactive/hispeed_freq
-		echo 26666 > /sys/devices/system/cpu/cpufreq/policy4/interactive/timer_rate
+		echo 16666 > /sys/devices/system/cpu/cpufreq/policy4/interactive/timer_rate
 		echo 0 1056000:20000 1574400:60000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/above_hispeed_delay
 		echo 400 > /sys/devices/system/cpu/cpufreq/policy4/interactive/go_hispeed_load
-		echo 19000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/min_sample_time
-		echo 79000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/max_freq_hysteresis
+		echo 10000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/min_sample_time
+		echo 70000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/max_freq_hysteresis
 		echo 0 > /sys/devices/system/cpu/cpufreq/policy4/interactive/boost
 		echo 1 > /sys/devices/system/cpu/cpufreq/policy4/interactive/fast_ramp_down
 		echo 1 > /sys/devices/system/cpu/cpufreq/policy4/interactive/use_sched_load
-		echo 80000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/boostpulse_duration
+		echo 50000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/boostpulse_duration
 		echo 0 > /sys/devices/system/cpu/cpufreq/policy4/interactive/io_is_busy
 		echo 0 > /sys/devices/system/cpu/cpufreq/policy4/interactive/enable_prediction
 	elif grep "msm8996" /system/build.prop || grep "msm8996" /vendor/build.prop; then
@@ -54,10 +54,10 @@ else
 		echo 76 729600:81 844800:84 1228800:86 1324800:92 1478400:99 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/target_loads
 		echo 90000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/timer_slack
 		echo 1228800 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/hispeed_freq
-		echo 20000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/timer_rate
+		echo 16666 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/timer_rate
 		echo 0 844800:40000 1228800:60000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/above_hispeed_delay
 		echo 400 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/go_hispeed_load
-		echo 10000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/min_sample_time	
+		echo 0 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/min_sample_time	
 		echo 0 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/max_freq_hysteresis
 		echo 1 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/use_sched_load
 		echo 0 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/boostpulse_duration
@@ -65,10 +65,10 @@ else
 		echo 78 729600:80 806400:84 1248000:88 1324800:90 1785600:96 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/target_loads
 		echo 90000 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/timer_slack
 		echo 1248000 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/hispeed_freq
-		echo 30000 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/timer_rate
+		echo 20000 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/timer_rate
 		echo 0 1248000:60000 1324800:80000 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/above_hispeed_delay
 		echo 400 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/go_hispeed_load
-		echo 25000 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/min_sample_time	
+		echo 10000 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/min_sample_time	
 		echo 0 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/min_sample_time		
 		echo 0 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/max_freq_hysteresis
 		echo 0 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/boost
@@ -76,7 +76,7 @@ else
 		echo 0 > /sys/devices/system/cpu/cpu2/cpufreq/interactive/boostpulse_duration
 	elif grep "msm8994" /system/build.prop;then
 		#LITTLE
-		echo 76 600000:40 672000:58 768000:82 960000:89 1248000:94  1478000:99 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/target_loads
+		echo 76 672000:64 768000:82 960000:89 1248000:94  1478000:99 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/target_loads
 		echo 356940 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/timer_slack
 		echo 600000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/hispeed_freq
 		echo 20000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/timer_rate
@@ -92,7 +92,7 @@ else
 		echo 1 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/use_sched_load
 		echo 0 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/boostpulse_duration
 		#big
-		echo 76 633000:48 768000:57 1248000:74 1440000:86 1958400:99 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/target_loads
+		echo 76 768000:72 1248000:74 1440000:86 1958400:99 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/target_loads
 		echo 178470 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/timer_slack
 		echo 1958400 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/hispeed_freq
 		echo 20000 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/timer_rate
@@ -109,7 +109,7 @@ else
 		echo 0 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/boostpulse_duration
 	elif grep "msm8992" /system/build.prop;then
 		#LITTLE
-		echo 76 672000:58 787200:82 960000:89 1248000:99 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/target_loads
+		echo 76 787200:82 960000:89 1248000:99 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/target_loads
 		echo 356940 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/timer_slack
 		echo 600000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/hispeed_freq
 		echo 20000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/timer_rate
@@ -122,7 +122,7 @@ else
 		echo 1 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/use_sched_load
 		echo 0 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/boostpulse_duration
 		#big
-		echo 76 768000:57 1248000:74 1440000:86 1824000:99 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/target_loads
+		echo 76 768000:72 1248000:74 1440000:86 1824000:99 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/target_loads
 		echo 178470 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/timer_slack
 		echo 1824000 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/hispeed_freq
 		echo 20000 > /sys/devices/system/cpu/cpu4/cpufreq/interactive/timer_rate
@@ -179,9 +179,9 @@ echo 16384 > /proc/sys/fs/inotify/max_user_watches
 chown root /sys/module/lowmemorykiller/parameters/enable_adaptive_lmk
 echo 0 > /sys/module/lowmemorykiller/parameters/enable_adaptive_lmk
 if grep "OnePlus" /system/build.prop; then
-	echo "12288,15360,18432,21504,36864,53760" > /sys/module/lowmemorykiller/parameters/minfree
+	echo "9216,11520,13824,16128,27648,47040" > /sys/module/lowmemorykiller/parameters/minfree
 else
-	echo "18432,23040,27648,32256,64512,94080" > /sys/module/lowmemorykiller/parameters/minfree
+	echo "16384,20480,24576,28672,49152,70560" > /sys/module/lowmemorykiller/parameters/minfree
 fi
 echo 0 > /sys/module/lowmemorykiller/parameters/debug_level
 
