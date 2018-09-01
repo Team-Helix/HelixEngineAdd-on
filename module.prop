@@ -4,4 +4,4 @@ version=v5
 versionCode=1
 author=RogerF81
 description=Runs some further tweaks for HelixEngine.
-minMagisk=1500
+minMagisk=17000
