@@ -22,12 +22,12 @@ else
 		#LITTLE
 		echo 83 883200:85 1171200:87 1324800:91 1555200:95 > /sys/devices/system/cpu/cpufreq/policy0/interactive/target_loads
 		echo 90000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/timer_slack
-		echo 16666 > /sys/devices/system/cpu/cpufreq/policy0/interactive/timer_rate
+		echo 20000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/timer_rate
 		echo 1248000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/hispeed_freq
 		echo 0 1056000:20000 1248000:40000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/above_hispeed_delay
 		echo 400 > /sys/devices/system/cpu/cpufreq/policy0/interactive/go_hispeed_load
 		echo 10000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/min_sample_time
-		echo 70000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/max_freq_hysteresis
+		echo 0 > /sys/devices/system/cpu/cpufreq/policy0/interactive/max_freq_hysteresis
 		echo 0 > /sys/devices/system/cpu/cpufreq/policy0/interactive/boost
 		echo 0 > /sys/devices/system/cpu/cpufreq/policy0/interactive/fast_ramp_down
 		echo 1 > /sys/devices/system/cpu/cpufreq/policy0/interactive/use_sched_load
@@ -38,11 +38,11 @@ else
 		echo 84 979200:86 1344000:88 1574400:91 1804800:95 > /sys/devices/system/cpu/cpufreq/policy4/interactive/target_loads
 		echo 90000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/timer_slack
 		echo 1574400 > /sys/devices/system/cpu/cpufreq/policy4/interactive/hispeed_freq
-		echo 16666 > /sys/devices/system/cpu/cpufreq/policy4/interactive/timer_rate
+		echo 20000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/timer_rate
 		echo 0 1056000:20000 1574400:60000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/above_hispeed_delay
 		echo 400 > /sys/devices/system/cpu/cpufreq/policy4/interactive/go_hispeed_load
 		echo 10000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/min_sample_time
-		echo 70000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/max_freq_hysteresis
+		echo 0 > /sys/devices/system/cpu/cpufreq/policy4/interactive/max_freq_hysteresis
 		echo 0 > /sys/devices/system/cpu/cpufreq/policy4/interactive/boost
 		echo 1 > /sys/devices/system/cpu/cpufreq/policy4/interactive/fast_ramp_down
 		echo 1 > /sys/devices/system/cpu/cpufreq/policy4/interactive/use_sched_load
@@ -54,7 +54,7 @@ else
 		echo 76 729600:81 844800:84 1228800:86 1324800:92 1478400:99 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/target_loads
 		echo 90000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/timer_slack
 		echo 1228800 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/hispeed_freq
-		echo 16666 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/timer_rate
+		echo 20000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/timer_rate
 		echo 0 844800:40000 1228800:60000 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/above_hispeed_delay
 		echo 400 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/go_hispeed_load
 		echo 0 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/min_sample_time	
