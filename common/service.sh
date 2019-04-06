@@ -1,11 +1,20 @@
 #!/system/bin/sh
-# Please don't hardcode /magisk/modname/... ; instead, please use $MODDIR/...
-# This will make your scripts compatible even if Magisk change its mount point in the future
+# Do NOT assume where your module will be located.
+# ALWAYS use $MODDIR if you need to know where this script
+# and module is placed.
+# This will make sure your module will still work
+# if Magisk change its mount point in the future
 MODDIR=${0%/*}
 
 # This script will be executed in late_start service mode
-# More info in the main Magisk thread
-sleep 20
+sleep 60
+
+# Disable sysctl.conf to Prevent ROM Interference
+if [ -e /system/etc/sysctl.conf ]; then
+  mount -o remount,rw /system
+  mv /system/etc/sysctl.conf /system/etc/sysctl.conf.bak
+  mount -o remount,ro /system
+fi
 
 #Governor
 if grep "schedutil" /sys/devices/system/cpu/cpufreq/policy0/scaling_available_governors; then
@@ -186,7 +195,7 @@ echo 1 > /sys/devices/soc/b00000.qcom,kgsl-3d0/devfreq/b00000.qcom,kgsl-3d0/adre
 
 #TCP
 echo westwood > /proc/sys/net/ipv4/tcp_congestion_control
-echo 2 > /proc/sys/net/ipv4/tcp_ecn
+echo 1 > /proc/sys/net/ipv4/tcp_ecn #stock is 2
 echo 1 > /proc/sys/net/ipv4/tcp_dsack
 echo 0 > /proc/sys/net/ipv4/tcp_low_latency
 echo 1 > /proc/sys/net/ipv4/tcp_timestamps
@@ -199,6 +208,8 @@ echo Y > /sys/module/workqueue/parameters/power_efficient
 #zRAM, if present, LMK & VM
 chown root /sys/module/lowmemorykiller/parameters/enable_adaptive_lmk
 echo 0 > /sys/module/lowmemorykiller/parameters/enable_adaptive_lmk
+sync # sync caches
+echo 3 > /proc/sys/vm/drop_caches # drop caches
 mem=$(cat /proc/meminfo | grep MemTotal | awk '{print $2}' );
 if (( $mem < '4194304' )); then
 	if [ -e /sys/block/zram0 ]; then
@@ -223,46 +234,65 @@ if (( $mem < '4194304' )); then
 		echo "27648,41472,48384,72192,84224,121856" > /sys/module/lowmemorykiller/parameters/minfree
 		echo 8 > /proc/sys/vm/swappiness
 		echo 100 > /proc/sys/vm/vfs_cache_pressure
-		echo 5 > /proc/sys/vm/dirty_ratio
+		echo 20 > /proc/sys/vm/dirty_ratio
 		echo 2 > /proc/sys/vm/dirty_background_ratio
 		echo 50 > /proc/sys/vm/overcommit_ratio
 		echo 7542 > /proc/sys/vm/min_free_kbytes
 else
 	swapoff /dev/block/zram0 > /dev/null 2>&1
 	echo "18432,23040,32256,48128,52640,76160"
-	echo 0 > /proc/sys/vm/swappiness
+	echo 5 > /proc/sys/vm/swappiness
 	echo 70 > /proc/sys/vm/vfs_cache_pressure
-	echo 10 > /proc/sys/vm/dirty_ratio
+	echo 50 > /proc/sys/vm/dirty_ratio
 	echo 5 > /proc/sys/vm/dirty_background_ratio
 	echo 80 > /proc/sys/vm/overcommit_ratio
 	echo 11088 > /proc/sys/vm/min_free_kbytes
 fi
 echo 0 > /sys/module/lowmemorykiller/parameters/debug_level
 
+#FS
+echo 10 > /proc/sys/fs/lease-break-time # stock is 45
+
+# Increase Kernel Entropy
+echo 128 > /proc/sys/kernel/random/read_wakeup_threshold # stock is 64
+echo 2048 > /proc/sys/kernel/random/write_wakeup_threshold # stock is 896
 
 #VM
 #echo 1000 > /proc/sys/vm/dirty_expire_centisecs
 #echo 1500 > /proc/sys/vm/dirty_writeback_centisecs
+echo 6000 > /proc/sys/vm/dirty_expire_centisecs # stock is 200 android, 3000 linux
+echo 2000 > /proc/sys/vm/dirty_writeback_centisecs # stock is 500 android and linux, 0 disables
 echo 0 > /proc/sys/vm/oom_kill_allocating_task
 echo 2 > /proc/sys/vm/page-cluster
 echo 1 > /proc/sys/vm/overcommit_memory
 echo 64 > /proc/sys/kernel/random/read_wakeup_threshold
 echo 896 > /proc/sys/kernel/random/write_wakeup_threshold
+echo 0 > /proc/sys/vm/oom_dump_tasks # stock is 1
+echo 60 > /proc/sys/vm/stat_interval # stock is 1
+echo 0 > /proc/sys/vm/drop_caches # reset normal caching
 
-#loop tweaks
-for i in /sys/block/loop*; do
-   echo 0 > $i/queue/add_random
-   echo 0 > $i/queue/iostats
-   echo 1 > $i/queue/nomerges
-   echo 0 > $i/queue/rotational
-   echo 1 > $i/queue/rq_affinity
+# Tweak Block-level Scheduler Queue
+for i in /sys/block/*/queue; do
+  echo 0 > $i/add_random # stock varies
+  echo 0 > $i/iostats # stock is 1
+  echo 0 > $i/nomerges # stock varies, was 1 up to now
+  echo 32 > $i/nr_requests # stock is 128 for all blocks
+  echo 1024 > $i/read_ahead_kb # stock mostly 128 but varies
+  echo 0 > $i/rotational # stock varies
+  echo 1 > $i/rq_affinity # stock is 0 or 1
+  #echo "cfq" > $i/scheduler # stock is cfq
 done
 
 #ram tweaks
 for j in /sys/block/ram*; do
    echo 0 > $j/queue/add_random
    echo 0 > $j/queue/iostats
-   echo 1 > $j/queue/nomerges
+   echo 0 > $j/queue/nomerges #was 1 up to now
    echo 0 > $j/queue/rotational
    echo 1 > $j/queue/rq_affinity
+done
+
+# Tweak Transmission Queue Buffer
+for i in $(find /sys/class/net -type l); do
+  echo 128 > $i/tx_queue_len
 done
