@@ -240,7 +240,7 @@ if (( $mem < '4194304' )); then
 		echo 7542 > /proc/sys/vm/min_free_kbytes
 else
 	swapoff /dev/block/zram0 > /dev/null 2>&1
-	echo "18432,23040,32256,48128,52640,76160"
+	echo "18432,23040,32256,48128,52640,76160" > /sys/module/lowmemorykiller/parameters/minfree
 	echo 5 > /proc/sys/vm/swappiness
 	echo 70 > /proc/sys/vm/vfs_cache_pressure
 	echo 50 > /proc/sys/vm/dirty_ratio
