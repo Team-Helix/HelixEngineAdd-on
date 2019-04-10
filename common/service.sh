@@ -7,7 +7,15 @@
 MODDIR=${0%/*}
 
 # This script will be executed in late_start service mode
-sleep 60
+
+#Disable BCL
+if [ -e "/sys/devices/soc/soc:qcom,bcl/mode" ]; then
+	chmod 644 /sys/devices/soc/soc:qcom,bcl/mode
+	echo -n disable > /sys/devices/soc/soc:qcom,bcl/mode
+fi
+
+#Stopping perfd
+stop perfd
 
 # Disable sysctl.conf to Prevent ROM Interference
 if [ -e /system/etc/sysctl.conf ]; then
@@ -16,15 +24,23 @@ if [ -e /system/etc/sysctl.conf ]; then
   mount -o remount,ro /system
 fi
 
+sleep 60
+
+## Kernel Entropy, very experimental! If you run into issues, set it back to stock values!
+echo 128 > /proc/sys/kernel/random/read_wakeup_threshold # stock is 64
+echo 2048 > /proc/sys/kernel/random/write_wakeup_threshold # stock is 896
+
+#FS
+echo 10 > /proc/sys/fs/lease-break-time # stock is 45
+
+#Workqueue
+echo Y > /sys/module/workqueue/parameters/power_efficient
+
 #Governor
 if grep "schedutil" /sys/devices/system/cpu/cpufreq/policy0/scaling_available_governors; then
 	#LITTLE
-	echo 1000 > /sys/devices/system/cpu/cpufreq/policy0/schedutil/up_rate_limit_us
-	echo 2000 > /sys/devices/system/cpu/cpufreq/policy0/schedutil/down_rate_limit_us
 	echo 0 > /sys/devices/system/cpu/cpufreq/policy0/schedutil/iowait_boost_enable
 	#big
-	echo 1000 > /sys/devices/system/cpu/cpufreq/policy4/schedutil/up_rate_limit_us
-	echo 2000 > /sys/devices/system/cpu/cpufreq/policy4/schedutil/down_rate_limit_us
 	echo 0 > /sys/devices/system/cpu/cpufreq/policy4/schedutil/iowait_boost_enable
 	echo 0 /sys/module/cpu-boost/parameters/dynamic_stune_boost
 	echo 0:0 4:0 >/sys/module/cpu-boost/parameters/input_boost_freq
@@ -160,35 +176,6 @@ fi
 echo 0 > /sys/module/msm_performance/parameters/touchboost
 echo 0 > /sys/power/pnpmgr/touch_boost
 
-#I/0
-if [ -d /sys/block/sda/ ]; then
-	echo "cfq" > /sys/block/sda/queue/scheduler
-	echo 1536 > /sys/block/sda/queue/read_ahead_kb
-	echo 128 > /sys/block/sda/queue/nr_requests
-	echo 0 > /sys/block/sda/queue/add_random
-	echo 0 > /sys/block/sda/queue/iostats
-	echo 1 > /sys/block/sda/queue/nomerges
-	echo 0 > /sys/block/sda/queue/rotational
-	echo 1 > /sys/block/sda/queue/rq_affinity
-else 
-	echo "cfq" > /sys/block/mmcblk0/queue/scheduler
-	echo 1536 > /sys/block/mmcblk0/queue/read_ahead_kb
-	echo 128 > /sys/block/mmcblk0/queue/nr_requests
-	echo 0 > /sys/block/mmcblk0/queue/add_random
-	echo 0 > /sys/block/mmcblk0/queue/iostats
-	echo 1 > /sys/block/mmcblk0/queue/nomerges
-	echo 0 > /sys/block/mmcblk0/queue/rotational
-	echo 1 > /sys/block/mmcblk0/queue/rq_affinity
-	echo "cfq" > /sys/block/mmcblk1/queue/scheduler
-	echo 1024 > /sys/block/mmcblk1/queue/read_ahead_kb
-	echo 128 > /sys/block/mmcblk1/queue/nr_requests
-	echo 0 > /sys/block/mmcblk1/queue/add_random
-	echo 0 > /sys/block/mmcblk1/queue/iostats
-	echo 1 > /sys/block/mmcblk1/queue/nomerges
-	echo 0 > /sys/block/mmcblk1/queue/rotational
-	echo 1 > /sys/block/mmcblk1/queue/rq_affinity
-fi
-
 #Graphics
 echo 1 > /sys/devices/soc/5000000.qcom,kgsl-3d0/devfreq/5000000.qcom,kgsl-3d0/adrenoboost
 echo 1 > /sys/devices/soc/b00000.qcom,kgsl-3d0/devfreq/b00000.qcom,kgsl-3d0/adrenoboost
@@ -202,32 +189,66 @@ echo 1 > /proc/sys/net/ipv4/tcp_timestamps
 echo 1 > /proc/sys/net/ipv4/tcp_sack
 echo 1 > /proc/sys/net/ipv4/tcp_window_scaling
 
-#WQ
-echo Y > /sys/module/workqueue/parameters/power_efficient
+#VM
+#echo 1000 > /proc/sys/vm/dirty_expire_centisecs #value used before
+#echo 1500 > /proc/sys/vm/dirty_writeback_centisecs # value used before
+echo 6000 > /proc/sys/vm/dirty_expire_centisecs # stock is 200 android, 3000 linux
+echo 2000 > /proc/sys/vm/dirty_writeback_centisecs # stock is 500 android and linux, 0 disables
+echo 0 > /proc/sys/vm/oom_kill_allocating_task
+echo 2 > /proc/sys/vm/page-cluster
+echo 1 > /proc/sys/vm/overcommit_memory
+echo 0 > /proc/sys/vm/oom_dump_tasks # stock is 1
+echo 60 > /proc/sys/vm/stat_interval # stock is 1
+echo 0 > /proc/sys/vm/drop_caches # reset normal caching
 
-#zRAM, if present, LMK & VM
+# Tweak Block-level Scheduler Queue
+for i in /sys/block/*/queue; do
+  echo 0 > $i/add_random # stock varies
+  echo 0 > $i/iostats # stock is 1
+  echo 0 > $i/nomerges # stock varies, was 1 up to now
+  echo 64 > $i/nr_requests # stock is 128 for all blocks
+  echo 1536 > $i/read_ahead_kb # mostly 128, sometimes 1024
+  echo 0 > $i/rotational # stock varies
+  echo 1 > $i/rq_affinity # stock is 0 or 1
+  echo "cfq" > $i/scheduler # stock is cfq, sometimes (none)
+done
+
+#Tuning zRAM additionally afterwards, if present, + LMK & VM
 chown root /sys/module/lowmemorykiller/parameters/enable_adaptive_lmk
 echo 0 > /sys/module/lowmemorykiller/parameters/enable_adaptive_lmk
-sync # sync caches
+sync; # sync caches
 echo 3 > /proc/sys/vm/drop_caches # drop caches
 mem=$(cat /proc/meminfo | grep MemTotal | awk '{print $2}' );
-if (( $mem < '4194304' )); then
+if (( $mem < '3145728' )); then
+	swapoff /dev/block/zram0 > /dev/null 2>&1
+	echo 1 > /sys/block/zram0/reset
+	echo 0 > /sys/block/zram0/disksize
+	echo zstd > /sys/block/zram0/comp_algorithm
+	echo lz4 > /sys/block/zram0/comp_algorithm
+	echo 4 > /sys/block/zram0/max_comp_streams
+	echo 8 > /sys/block/zram0/swappiness
+	zRamMem=$(( $mem / 3 ));
+	echo "$zRamMem" > /sys/block/zram0/disksize
+	mkswap /dev/block/zram0 > /dev/null 2>&1
+	swapon /dev/block/zram0 > /dev/null 2>&1
+	echo "41472,48384,72192,84224,105280,126336" > /sys/module/lowmemorykiller/parameters/minfree
+	echo 20 > /proc/sys/vm/swappiness
+	echo 100 > /proc/sys/vm/vfs_cache_pressure
+	echo 20 > /proc/sys/vm/dirty_ratio
+	echo 2 > /proc/sys/vm/dirty_background_ratio
+	echo 50 > /proc/sys/vm/overcommit_ratio
+	echo 7542 > /proc/sys/vm/min_free_kbytes
+elif (( $mem < '4194304' )); then
 	if [ -e /sys/block/zram0 ]; then
 		swapoff /dev/block/zram0 > /dev/null 2>&1
 		echo 1 > /sys/block/zram0/reset
-		#echo zstd > /sys/block/zram0/comp_algorithm
-		echo lz4 > /sys/block/zram0/comp_algorithm
 		echo 0 > /sys/block/zram0/disksize
-		echo 0 > /sys/block/zram0/queue/add_random 
-		echo 0 > /sys/block/zram0/queue/iostats 
-		echo 2 > /sys/block/zram0/queue/nomerges 
-		echo 0 > /sys/block/zram0/queue/rotational 
-		echo 1 > /sys/block/zram0/queue/rq_affinity
-		echo 64 > /sys/block/zram0/queue/nr_requests
+		echo zstd > /sys/block/zram0/comp_algorithm
+		echo lz4 > /sys/block/zram0/comp_algorithm
 		echo 4 > /sys/block/zram0/max_comp_streams
 		echo 8 > /sys/block/zram0/swappiness
-		chmod 644 /sys/block/zram0/disksize
-		echo 536870912 > /sys/block/zram0/disksize
+		zRamMem=$(( $mem / 4 ));
+		echo "$zRamMem" > /sys/block/zram0/disksize
 		mkswap /dev/block/zram0 > /dev/null 2>&1
 		swapon /dev/block/zram0 > /dev/null 2>&1
 	fi
@@ -238,8 +259,30 @@ if (( $mem < '4194304' )); then
 		echo 2 > /proc/sys/vm/dirty_background_ratio
 		echo 50 > /proc/sys/vm/overcommit_ratio
 		echo 7542 > /proc/sys/vm/min_free_kbytes
+elif (( $mem < '6291456' )); then
+	if [ -e /sys/block/zram0 ]; then
+		swapoff /dev/block/zram0 > /dev/null 2>&1
+		echo 1 > /sys/block/zram0/reset
+		echo 0 > /sys/block/zram0/disksize
+		echo zstd > /sys/block/zram0/comp_algorithm
+		echo lz4 > /sys/block/zram0/comp_algorithm
+		echo 4 > /sys/block/zram0/max_comp_streams
+		echo 5 > /sys/block/zram0/swappiness
+		zRamMem=$(( $mem / 6 ));
+		echo "$zRamMem" > /sys/block/zram0/disksize
+		mkswap /dev/block/zram0 > /dev/null 2>&1
+		swapon /dev/block/zram0 > /dev/null 2>&1
+	fi
+		echo "18432,23040,32256,48128,52640,76160" > /sys/module/lowmemorykiller/parameters/minfree
+		echo 5 > /proc/sys/vm/swappiness
+		echo 100 > /proc/sys/vm/vfs_cache_pressure
+		echo 20 > /proc/sys/vm/dirty_ratio
+		echo 2 > /proc/sys/vm/dirty_background_ratio
+		echo 50 > /proc/sys/vm/overcommit_ratio
+		echo 7542 > /proc/sys/vm/min_free_kbytes		
 else
 	swapoff /dev/block/zram0 > /dev/null 2>&1
+	echo 0 > /sys/block/zram0/disksize
 	echo "18432,23040,32256,48128,52640,76160" > /sys/module/lowmemorykiller/parameters/minfree
 	echo 5 > /proc/sys/vm/swappiness
 	echo 70 > /proc/sys/vm/vfs_cache_pressure
@@ -249,48 +292,6 @@ else
 	echo 11088 > /proc/sys/vm/min_free_kbytes
 fi
 echo 0 > /sys/module/lowmemorykiller/parameters/debug_level
-
-#FS
-echo 10 > /proc/sys/fs/lease-break-time # stock is 45
-
-# Increase Kernel Entropy
-echo 128 > /proc/sys/kernel/random/read_wakeup_threshold # stock is 64
-echo 2048 > /proc/sys/kernel/random/write_wakeup_threshold # stock is 896
-
-#VM
-#echo 1000 > /proc/sys/vm/dirty_expire_centisecs
-#echo 1500 > /proc/sys/vm/dirty_writeback_centisecs
-echo 6000 > /proc/sys/vm/dirty_expire_centisecs # stock is 200 android, 3000 linux
-echo 2000 > /proc/sys/vm/dirty_writeback_centisecs # stock is 500 android and linux, 0 disables
-echo 0 > /proc/sys/vm/oom_kill_allocating_task
-echo 2 > /proc/sys/vm/page-cluster
-echo 1 > /proc/sys/vm/overcommit_memory
-echo 64 > /proc/sys/kernel/random/read_wakeup_threshold
-echo 896 > /proc/sys/kernel/random/write_wakeup_threshold
-echo 0 > /proc/sys/vm/oom_dump_tasks # stock is 1
-echo 60 > /proc/sys/vm/stat_interval # stock is 1
-echo 0 > /proc/sys/vm/drop_caches # reset normal caching
-
-# Tweak Block-level Scheduler Queue
-for i in /sys/block/*/queue; do
-  echo 0 > $i/add_random # stock varies
-  echo 0 > $i/iostats # stock is 1
-  echo 0 > $i/nomerges # stock varies, was 1 up to now
-  echo 32 > $i/nr_requests # stock is 128 for all blocks
-  echo 1024 > $i/read_ahead_kb # stock mostly 128 but varies
-  echo 0 > $i/rotational # stock varies
-  echo 1 > $i/rq_affinity # stock is 0 or 1
-  #echo "cfq" > $i/scheduler # stock is cfq
-done
-
-#ram tweaks
-for j in /sys/block/ram*; do
-   echo 0 > $j/queue/add_random
-   echo 0 > $j/queue/iostats
-   echo 0 > $j/queue/nomerges #was 1 up to now
-   echo 0 > $j/queue/rotational
-   echo 1 > $j/queue/rq_affinity
-done
 
 # Tweak Transmission Queue Buffer
 for i in $(find /sys/class/net -type l); do
