@@ -8,14 +8,16 @@ MODDIR=${0%/*}
 
 # This script will be executed in late_start service mode
 
+sleep 60
+
+#Stopping perfd
+stop perfd
+
 #Disable BCL
 if [ -e "/sys/devices/soc/soc:qcom,bcl/mode" ]; then
 	chmod 644 /sys/devices/soc/soc:qcom,bcl/mode
 	echo -n disable > /sys/devices/soc/soc:qcom,bcl/mode
 fi
-
-#Stopping perfd
-stop perfd
 
 # Disable sysctl.conf to Prevent ROM Interference
 if [ -e /system/etc/sysctl.conf ]; then
@@ -24,23 +26,15 @@ if [ -e /system/etc/sysctl.conf ]; then
   mount -o remount,ro /system
 fi
 
-sleep 60
-
-## Kernel Entropy, very experimental! If you run into issues, set it back to stock values!
-echo 128 > /proc/sys/kernel/random/read_wakeup_threshold # stock is 64
-echo 2048 > /proc/sys/kernel/random/write_wakeup_threshold # stock is 896
-
-#FS
-echo 10 > /proc/sys/fs/lease-break-time # stock is 45
-
-#Workqueue
-echo Y > /sys/module/workqueue/parameters/power_efficient
-
 #Governor
 if grep "schedutil" /sys/devices/system/cpu/cpufreq/policy0/scaling_available_governors; then
 	#LITTLE
+	echo 20000 > /sys/devices/system/cpu/cpufreq/policy0/schedutil/down_rate_limit_us; # test is 25000
+	echo 500 > /sys/devices/system/cpu/cpufreq/policy0/schedutil/up_rate_limit_us; # test is 1000
 	echo 0 > /sys/devices/system/cpu/cpufreq/policy0/schedutil/iowait_boost_enable
 	#big
+	echo 20000 > /sys/devices/system/cpu/cpufreq/policy4/schedutil/down_rate_limit_us; # test is 25000
+	echo 500 > /sys/devices/system/cpu/cpufreq/policy4/schedutil/up_rate_limit_us; # test is 1000
 	echo 0 > /sys/devices/system/cpu/cpufreq/policy4/schedutil/iowait_boost_enable
 	echo 0 /sys/module/cpu-boost/parameters/dynamic_stune_boost
 	echo 0:0 4:0 >/sys/module/cpu-boost/parameters/input_boost_freq
@@ -180,6 +174,16 @@ echo 0 > /sys/power/pnpmgr/touch_boost
 echo 1 > /sys/devices/soc/5000000.qcom,kgsl-3d0/devfreq/5000000.qcom,kgsl-3d0/adrenoboost
 echo 1 > /sys/devices/soc/b00000.qcom,kgsl-3d0/devfreq/b00000.qcom,kgsl-3d0/adrenoboost
 
+#Workqueue
+echo Y > /sys/module/workqueue/parameters/power_efficient
+
+## Kernel Entropy, very experimental! If you run into issues, set it back to stock values!
+echo 128 > /proc/sys/kernel/random/read_wakeup_threshold # stock is 64
+echo 2048 > /proc/sys/kernel/random/write_wakeup_threshold # stock is 896
+
+#FS
+echo 10 > /proc/sys/fs/lease-break-time # stock is 45
+
 #TCP
 echo westwood > /proc/sys/net/ipv4/tcp_congestion_control
 echo 1 > /proc/sys/net/ipv4/tcp_ecn #stock is 2
@@ -233,11 +237,11 @@ if (( $mem < '3145728' )); then
 	swapon /dev/block/zram0 > /dev/null 2>&1
 	echo "41472,48384,72192,84224,105280,126336" > /sys/module/lowmemorykiller/parameters/minfree
 	echo 20 > /proc/sys/vm/swappiness
-	echo 100 > /proc/sys/vm/vfs_cache_pressure
-	echo 20 > /proc/sys/vm/dirty_ratio
+	echo 20 > /proc/sys/vm/vfs_cache_pressure
+	echo 15 > /proc/sys/vm/dirty_ratio
 	echo 2 > /proc/sys/vm/dirty_background_ratio
 	echo 50 > /proc/sys/vm/overcommit_ratio
-	echo 7542 > /proc/sys/vm/min_free_kbytes
+	echo 4096 > /proc/sys/vm/min_free_kbytes
 elif (( $mem < '4194304' )); then
 	if [ -e /sys/block/zram0 ]; then
 		swapoff /dev/block/zram0 > /dev/null 2>&1
@@ -254,11 +258,11 @@ elif (( $mem < '4194304' )); then
 	fi
 		echo "27648,41472,48384,72192,84224,121856" > /sys/module/lowmemorykiller/parameters/minfree
 		echo 8 > /proc/sys/vm/swappiness
-		echo 100 > /proc/sys/vm/vfs_cache_pressure
+		echo 70 > /proc/sys/vm/vfs_cache_pressure
 		echo 20 > /proc/sys/vm/dirty_ratio
 		echo 2 > /proc/sys/vm/dirty_background_ratio
 		echo 50 > /proc/sys/vm/overcommit_ratio
-		echo 7542 > /proc/sys/vm/min_free_kbytes
+		echo 7168  > /proc/sys/vm/min_free_kbytes
 elif (( $mem < '6291456' )); then
 	if [ -e /sys/block/zram0 ]; then
 		swapoff /dev/block/zram0 > /dev/null 2>&1
@@ -275,7 +279,7 @@ elif (( $mem < '6291456' )); then
 	fi
 		echo "18432,23040,32256,48128,52640,76160" > /sys/module/lowmemorykiller/parameters/minfree
 		echo 5 > /proc/sys/vm/swappiness
-		echo 100 > /proc/sys/vm/vfs_cache_pressure
+		echo 90 > /proc/sys/vm/vfs_cache_pressure
 		echo 20 > /proc/sys/vm/dirty_ratio
 		echo 2 > /proc/sys/vm/dirty_background_ratio
 		echo 50 > /proc/sys/vm/overcommit_ratio
@@ -285,7 +289,7 @@ else
 	echo 0 > /sys/block/zram0/disksize
 	echo "18432,23040,32256,48128,52640,76160" > /sys/module/lowmemorykiller/parameters/minfree
 	echo 5 > /proc/sys/vm/swappiness
-	echo 70 > /proc/sys/vm/vfs_cache_pressure
+	echo 100 > /proc/sys/vm/vfs_cache_pressure
 	echo 50 > /proc/sys/vm/dirty_ratio
 	echo 5 > /proc/sys/vm/dirty_background_ratio
 	echo 80 > /proc/sys/vm/overcommit_ratio
