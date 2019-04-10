@@ -28,13 +28,7 @@ fi
 
 #Governor
 if grep "schedutil" /sys/devices/system/cpu/cpufreq/policy0/scaling_available_governors; then
-	#LITTLE
-	echo 20000 > /sys/devices/system/cpu/cpufreq/policy0/schedutil/down_rate_limit_us; # test is 25000
-	echo 500 > /sys/devices/system/cpu/cpufreq/policy0/schedutil/up_rate_limit_us; # test is 1000
 	echo 0 > /sys/devices/system/cpu/cpufreq/policy0/schedutil/iowait_boost_enable
-	#big
-	echo 20000 > /sys/devices/system/cpu/cpufreq/policy4/schedutil/down_rate_limit_us; # test is 25000
-	echo 500 > /sys/devices/system/cpu/cpufreq/policy4/schedutil/up_rate_limit_us; # test is 1000
 	echo 0 > /sys/devices/system/cpu/cpufreq/policy4/schedutil/iowait_boost_enable
 	echo 0 /sys/module/cpu-boost/parameters/dynamic_stune_boost
 	echo 0:0 4:0 >/sys/module/cpu-boost/parameters/input_boost_freq
@@ -229,13 +223,13 @@ if (( $mem < '3145728' )); then
 	echo 0 > /sys/block/zram0/disksize
 	echo zstd > /sys/block/zram0/comp_algorithm
 	echo lz4 > /sys/block/zram0/comp_algorithm
+	mkswap /dev/block/zram0 > /dev/null 2>&1
+	swapon /dev/block/zram0 > /dev/null 2>&1
 	echo 4 > /sys/block/zram0/max_comp_streams
 	echo 8 > /sys/block/zram0/swappiness
 	zRamMem=$(( $mem / 3 ));
 	echo "$zRamMem" > /sys/block/zram0/disksize
-	mkswap /dev/block/zram0 > /dev/null 2>&1
-	swapon /dev/block/zram0 > /dev/null 2>&1
-	echo "41472,48384,72192,84224,105280,126336" > /sys/module/lowmemorykiller/parameters/minfree
+	echo "27648,32256,55296,80640,100800,126336" > /sys/module/lowmemorykiller/parameters/minfree
 	echo 20 > /proc/sys/vm/swappiness
 	echo 20 > /proc/sys/vm/vfs_cache_pressure
 	echo 15 > /proc/sys/vm/dirty_ratio
@@ -247,16 +241,16 @@ elif (( $mem < '4194304' )); then
 		swapoff /dev/block/zram0 > /dev/null 2>&1
 		echo 1 > /sys/block/zram0/reset
 		echo 0 > /sys/block/zram0/disksize
+		mkswap /dev/block/zram0 > /dev/null 2>&1
+		swapon /dev/block/zram0 > /dev/null 2>&1
 		echo zstd > /sys/block/zram0/comp_algorithm
 		echo lz4 > /sys/block/zram0/comp_algorithm
 		echo 4 > /sys/block/zram0/max_comp_streams
 		echo 8 > /sys/block/zram0/swappiness
 		zRamMem=$(( $mem / 4 ));
 		echo "$zRamMem" > /sys/block/zram0/disksize
-		mkswap /dev/block/zram0 > /dev/null 2>&1
-		swapon /dev/block/zram0 > /dev/null 2>&1
 	fi
-		echo "27648,41472,48384,72192,84224,121856" > /sys/module/lowmemorykiller/parameters/minfree
+		echo "23040,27648,32256,55296,80640,100800" > /sys/module/lowmemorykiller/parameters/minfree
 		echo 8 > /proc/sys/vm/swappiness
 		echo 70 > /proc/sys/vm/vfs_cache_pressure
 		echo 20 > /proc/sys/vm/dirty_ratio
@@ -268,16 +262,16 @@ elif (( $mem < '6291456' )); then
 		swapoff /dev/block/zram0 > /dev/null 2>&1
 		echo 1 > /sys/block/zram0/reset
 		echo 0 > /sys/block/zram0/disksize
+		mkswap /dev/block/zram0 > /dev/null 2>&1
+		swapon /dev/block/zram0 > /dev/null 2>&1
 		echo zstd > /sys/block/zram0/comp_algorithm
 		echo lz4 > /sys/block/zram0/comp_algorithm
 		echo 4 > /sys/block/zram0/max_comp_streams
 		echo 5 > /sys/block/zram0/swappiness
 		zRamMem=$(( $mem / 6 ));
 		echo "$zRamMem" > /sys/block/zram0/disksize
-		mkswap /dev/block/zram0 > /dev/null 2>&1
-		swapon /dev/block/zram0 > /dev/null 2>&1
 	fi
-		echo "18432,23040,32256,48128,52640,76160" > /sys/module/lowmemorykiller/parameters/minfree
+		echo "18432,23040,27648,32256,55296,80640" > /sys/module/lowmemorykiller/parameters/minfree
 		echo 5 > /proc/sys/vm/swappiness
 		echo 90 > /proc/sys/vm/vfs_cache_pressure
 		echo 20 > /proc/sys/vm/dirty_ratio
@@ -287,7 +281,7 @@ elif (( $mem < '6291456' )); then
 else
 	swapoff /dev/block/zram0 > /dev/null 2>&1
 	echo 0 > /sys/block/zram0/disksize
-	echo "18432,23040,32256,48128,52640,76160" > /sys/module/lowmemorykiller/parameters/minfree
+	echo "18432,23040,27648,32256,52640,76160" > /sys/module/lowmemorykiller/parameters/minfree
 	echo 5 > /proc/sys/vm/swappiness
 	echo 100 > /proc/sys/vm/vfs_cache_pressure
 	echo 50 > /proc/sys/vm/dirty_ratio
