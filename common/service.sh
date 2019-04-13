@@ -218,13 +218,10 @@ sync; # sync caches
 echo 3 > /proc/sys/vm/drop_caches # drop caches
 mem=$(cat /proc/meminfo | grep MemTotal | awk '{print $2}' );
 if (( $mem < '3145728' )); then
-	swapoff /dev/block/zram0 > /dev/null 2>&1
 	echo 1 > /sys/block/zram0/reset
-	echo 0 > /sys/block/zram0/disksize
 	echo zstd > /sys/block/zram0/comp_algorithm
 	echo lz4 > /sys/block/zram0/comp_algorithm
-	mkswap /dev/block/zram0 > /dev/null 2>&1
-	swapon /dev/block/zram0 > /dev/null 2>&1
+	swapon /dev/block/zram0
 	echo 4 > /sys/block/zram0/max_comp_streams
 	echo 8 > /sys/block/zram0/swappiness
 	zRamMem=$(( $mem / 3 ));
@@ -238,11 +235,8 @@ if (( $mem < '3145728' )); then
 	echo 4096 > /proc/sys/vm/min_free_kbytes
 elif (( $mem < '4194304' )); then
 	if [ -e /sys/block/zram0 ]; then
-		swapoff /dev/block/zram0 > /dev/null 2>&1
 		echo 1 > /sys/block/zram0/reset
-		echo 0 > /sys/block/zram0/disksize
-		mkswap /dev/block/zram0 > /dev/null 2>&1
-		swapon /dev/block/zram0 > /dev/null 2>&1
+		swapon /dev/block/zram0
 		echo zstd > /sys/block/zram0/comp_algorithm
 		echo lz4 > /sys/block/zram0/comp_algorithm
 		echo 4 > /sys/block/zram0/max_comp_streams
@@ -259,11 +253,9 @@ elif (( $mem < '4194304' )); then
 		echo 7168  > /proc/sys/vm/min_free_kbytes
 elif (( $mem < '6291456' )); then
 	if [ -e /sys/block/zram0 ]; then
-		swapoff /dev/block/zram0 > /dev/null 2>&1
 		echo 1 > /sys/block/zram0/reset
 		echo 0 > /sys/block/zram0/disksize
-		mkswap /dev/block/zram0 > /dev/null 2>&1
-		swapon /dev/block/zram0 > /dev/null 2>&1
+		swapon /dev/block/zram0
 		echo zstd > /sys/block/zram0/comp_algorithm
 		echo lz4 > /sys/block/zram0/comp_algorithm
 		echo 4 > /sys/block/zram0/max_comp_streams
@@ -279,7 +271,8 @@ elif (( $mem < '6291456' )); then
 		echo 50 > /proc/sys/vm/overcommit_ratio
 		echo 7542 > /proc/sys/vm/min_free_kbytes		
 else
-	swapoff /dev/block/zram0 > /dev/null 2>&1
+	swapoff /dev/block/zram0
+	echo 1 > /sys/block/zram0/reset
 	echo 0 > /sys/block/zram0/disksize
 	echo "18432,23040,27648,32256,52640,76160" > /sys/module/lowmemorykiller/parameters/minfree
 	echo 5 > /proc/sys/vm/swappiness
