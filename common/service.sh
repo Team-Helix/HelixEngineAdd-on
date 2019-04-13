@@ -217,17 +217,17 @@ echo 0 > /sys/module/lowmemorykiller/parameters/enable_adaptive_lmk
 sync; # sync caches
 echo 3 > /proc/sys/vm/drop_caches # drop caches
 mem=$(cat /proc/meminfo | grep MemTotal | awk '{print $2}' );
+mb=$(( 1024*1024 ));
 if (( $mem < '3145728' )); then
-	swapoff /dev/block/zram0 > /dev/null 2>&1
 	echo 1 > /sys/block/zram0/reset
 	echo 0 > /sys/block/zram0/disksize
-	echo zstd > /sys/block/zram0/comp_algorithm
-	echo lz4 > /sys/block/zram0/comp_algorithm
 	mkswap /dev/block/zram0 > /dev/null 2>&1
 	swapon /dev/block/zram0 > /dev/null 2>&1
+	echo zstd > /sys/block/zram0/comp_algorithm
+	echo lz4 > /sys/block/zram0/comp_algorithm
 	echo 4 > /sys/block/zram0/max_comp_streams
 	echo 8 > /sys/block/zram0/swappiness
-	zRamMem=$(( $mem / 3 ));
+	zRamMem=$(( $mb * 1536 ));
 	echo "$zRamMem" > /sys/block/zram0/disksize
 	echo "27648,32256,55296,80640,100800,126336" > /sys/module/lowmemorykiller/parameters/minfree
 	echo 20 > /proc/sys/vm/swappiness
@@ -238,7 +238,6 @@ if (( $mem < '3145728' )); then
 	echo 4096 > /proc/sys/vm/min_free_kbytes
 elif (( $mem < '4194304' )); then
 	if [ -e /sys/block/zram0 ]; then
-		swapoff /dev/block/zram0 > /dev/null 2>&1
 		echo 1 > /sys/block/zram0/reset
 		echo 0 > /sys/block/zram0/disksize
 		mkswap /dev/block/zram0 > /dev/null 2>&1
@@ -247,7 +246,10 @@ elif (( $mem < '4194304' )); then
 		echo lz4 > /sys/block/zram0/comp_algorithm
 		echo 4 > /sys/block/zram0/max_comp_streams
 		echo 8 > /sys/block/zram0/swappiness
-		zRamMem=$(( $mem / 4 ));
+		zRamMem=$(( $mb * 1024 ));
+		echo "$mem"
+		echo "$mb"
+		echo "$zRamMem"
 		echo "$zRamMem" > /sys/block/zram0/disksize
 	fi
 		echo "23040,27648,32256,55296,80640,100800" > /sys/module/lowmemorykiller/parameters/minfree
@@ -259,7 +261,6 @@ elif (( $mem < '4194304' )); then
 		echo 7168  > /proc/sys/vm/min_free_kbytes
 elif (( $mem < '6291456' )); then
 	if [ -e /sys/block/zram0 ]; then
-		swapoff /dev/block/zram0 > /dev/null 2>&1
 		echo 1 > /sys/block/zram0/reset
 		echo 0 > /sys/block/zram0/disksize
 		mkswap /dev/block/zram0 > /dev/null 2>&1
@@ -267,8 +268,8 @@ elif (( $mem < '6291456' )); then
 		echo zstd > /sys/block/zram0/comp_algorithm
 		echo lz4 > /sys/block/zram0/comp_algorithm
 		echo 4 > /sys/block/zram0/max_comp_streams
-		echo 5 > /sys/block/zram0/swappiness
-		zRamMem=$(( $mem / 6 ));
+		echo 8 > /sys/block/zram0/swappiness
+		zRamMem=$(( $mb * 512 ));
 		echo "$zRamMem" > /sys/block/zram0/disksize
 	fi
 		echo "18432,23040,27648,32256,55296,80640" > /sys/module/lowmemorykiller/parameters/minfree
@@ -280,6 +281,7 @@ elif (( $mem < '6291456' )); then
 		echo 7542 > /proc/sys/vm/min_free_kbytes		
 else
 	swapoff /dev/block/zram0 > /dev/null 2>&1
+	echo 1 > /sys/block/zram0/reset
 	echo 0 > /sys/block/zram0/disksize
 	echo "18432,23040,27648,32256,52640,76160" > /sys/module/lowmemorykiller/parameters/minfree
 	echo 5 > /proc/sys/vm/swappiness
@@ -290,6 +292,7 @@ else
 	echo 11088 > /proc/sys/vm/min_free_kbytes
 fi
 echo 0 > /sys/module/lowmemorykiller/parameters/debug_level
+echo 0 > /proc/sys/vm/drop_caches; # reset normal caching
 
 # Tweak Transmission Queue Buffer
 for i in $(find /sys/class/net -type l); do
