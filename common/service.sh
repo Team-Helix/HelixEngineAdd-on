@@ -40,11 +40,11 @@ if grep "schedutil" /sys/devices/system/cpu/cpufreq/policy0/scaling_available_go
 else
 	if grep "msm8998" /system/build.prop || grep "msm8998" /vendor/build.prop; then
 		#LITTLE
-		echo 82 883200:86 1094400:89 1324800:92 1555200:95 > /sys/devices/system/cpu/cpufreq/policy0/interactive/target_loads
+		echo 82 1094400:89 1478400:95 1824000:99 > /sys/devices/system/cpu/cpufreq/policy0/interactive/target_loads
 		echo 90000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/timer_slack
 		echo 20000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/timer_rate
 		echo 109440 > /sys/devices/system/cpu/cpufreq/policy0/interactive/hispeed_freq
-		echo 0 1094400:20000 1555200:40000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/above_hispeed_delay
+		echo 0 1094400:20000 1478400:30000 1824000:40000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/above_hispeed_delay
 		echo 400 > /sys/devices/system/cpu/cpufreq/policy0/interactive/go_hispeed_load
 		echo 10000 > /sys/devices/system/cpu/cpufreq/policy0/interactive/min_sample_time
 		echo 0 > /sys/devices/system/cpu/cpufreq/policy0/interactive/max_freq_hysteresis
@@ -55,11 +55,11 @@ else
 		echo 0 > /sys/devices/system/cpu/cpufreq/policy0/interactive/io_is_busy
 		echo 0 > /sys/devices/system/cpu/cpufreq/policy0/interactive/enable_prediction
 		#big
-		echo 84 806400:87 1267200:90 1574400:93 1958400:96 > /sys/devices/system/cpu/cpufreq/policy4/interactive/target_loads
+		echo 84 1132800:87 1420800:92 1804800:96 > /sys/devices/system/cpu/cpufreq/policy4/interactive/target_loads
 		echo 90000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/timer_slack
 		echo 1267200 > /sys/devices/system/cpu/cpufreq/policy4/interactive/hispeed_freq
 		echo 20000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/timer_rate
-		echo 0 806400:40000 1267200:80000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/above_hispeed_delay
+		echo 0 1420800:40000 1804800:80000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/above_hispeed_delay
 		echo 400 > /sys/devices/system/cpu/cpufreq/policy4/interactive/go_hispeed_load
 		echo 10000 > /sys/devices/system/cpu/cpufreq/policy4/interactive/min_sample_time
 		echo 0 > /sys/devices/system/cpu/cpufreq/policy4/interactive/max_freq_hysteresis
@@ -69,6 +69,10 @@ else
 		echo 0 > /sys/devices/system/cpu/cpufreq/policy4/interactive/boostpulse_duration
 		echo 0 > /sys/devices/system/cpu/cpufreq/policy4/interactive/io_is_busy
 		echo 0 > /sys/devices/system/cpu/cpufreq/policy4/interactive/enable_prediction
+		# A few miscellaneous kernel tweaks for better balance between battery life and performance for daily usage by @xFirefly93
+		echo "15000000" > /proc/sys/kernel/sched_latency_ns
+		echo "1000000" > /proc/sys/kernel/sched_min_granularity_ns
+		echo "2000000" > /proc/sys/kernel/sched_wakeup_granularity_ns
 	elif grep "msm8996" /system/build.prop || grep "msm8996" /vendor/build.prop; then
 		#LITTLE
 		echo 78 729600:81 844800:84 1228800:86 1324800:92 1478400:99 > /sys/devices/system/cpu/cpu0/cpufreq/interactive/target_loads
@@ -163,7 +167,6 @@ fi
 #Touchboost
 echo 0 > /sys/module/msm_performance/parameters/touchboost
 echo 0 > /sys/power/pnpmgr/touch_boost
-
 #Graphics
 echo 1 > /sys/devices/soc/5000000.qcom,kgsl-3d0/devfreq/5000000.qcom,kgsl-3d0/adrenoboost
 echo 1 > /sys/devices/soc/b00000.qcom,kgsl-3d0/devfreq/b00000.qcom,kgsl-3d0/adrenoboost
@@ -180,36 +183,48 @@ echo 10 > /proc/sys/fs/lease-break-time # stock is 45
 
 #TCP
 echo westwood > /proc/sys/net/ipv4/tcp_congestion_control
-echo 1 > /proc/sys/net/ipv4/tcp_ecn #stock is 2
+echo 2 > /proc/sys/net/ipv4/tcp_ecn
 echo 1 > /proc/sys/net/ipv4/tcp_dsack
 echo 0 > /proc/sys/net/ipv4/tcp_low_latency
 echo 1 > /proc/sys/net/ipv4/tcp_timestamps
 echo 1 > /proc/sys/net/ipv4/tcp_sack
 echo 1 > /proc/sys/net/ipv4/tcp_window_scaling
+echo 0 > /proc/sys/net/core/netdev_tstamp_prequeue
+echo 0 > /proc/sys/net/ipv4/cipso_cache_bucket_size
+echo 0 > /proc/sys/net/ipv4/cipso_cache_enable
+echo 0 > /proc/sys/net/ipv4/cipso_rbm_strictvalid
 
 #VM
 #echo 1000 > /proc/sys/vm/dirty_expire_centisecs #value used before
 #echo 1500 > /proc/sys/vm/dirty_writeback_centisecs # value used before
-echo 6000 > /proc/sys/vm/dirty_expire_centisecs # stock is 200 android, 3000 linux
-echo 2000 > /proc/sys/vm/dirty_writeback_centisecs # stock is 500 android and linux, 0 disables
-echo 0 > /proc/sys/vm/oom_kill_allocating_task
-echo 2 > /proc/sys/vm/page-cluster
+#echo 6000 > /proc/sys/vm/dirty_expire_centisecs # stock is 200 android, 3000 linux
+echo 600 > /proc/sys/vm/dirty_expire_centisecs
+echo 1500 > /proc/sys/vm/dirty_writeback_centisecs # stock is 500 android and linux, 0 disables
+#echo 0 > /proc/sys/vm/oom_kill_allocating_task
+echo 3 > /proc/sys/vm/page-cluster #stock Android is 3, Pixel is 0
 echo 1 > /proc/sys/vm/overcommit_memory
-echo 0 > /proc/sys/vm/oom_dump_tasks # stock is 1
+echo 1200 > /proc/sys/vm/stat_interval #by @xFirefly93
+#echo "0" > /proc/sys/vm/swap_ratio
+#echo 0 > /proc/sys/vm/oom_dump_tasks # stock is 1
 echo 60 > /proc/sys/vm/stat_interval # stock is 1
-echo 0 > /proc/sys/vm/drop_caches # reset normal caching
 
 # Tweak Block-level Scheduler Queue
 for i in /sys/block/*/queue; do
   echo 0 > $i/add_random # stock varies
   echo 0 > $i/iostats # stock is 1
-  echo 0 > $i/nomerges # stock varies, was 1 up to now
+  #echo 0 > $i/nomerges # stock varies, was 1 up to now
   echo 64 > $i/nr_requests # stock is 128 for all blocks
-  echo 1536 > $i/read_ahead_kb # mostly 128, sometimes 1024
+  #echo 1536 > $i/read_ahead_kb # mostly 128, sometimes 1024
+  echo 1024 > $i/read_ahead_kb # mostly 128, sometimes 1024
   echo 0 > $i/rotational # stock varies
   echo 1 > $i/rq_affinity # stock is 0 or 1
   echo "cfq" > $i/scheduler # stock is cfq, sometimes (none)
 done
+
+# Group_idle stock setting;
+for i in /sys/block/*/queue/iosched; do
+   echo "0" > $i/group_idle;
+done;
 
 #Tuning zRAM additionally afterwards, if present, + LMK & VM
 chown root /sys/module/lowmemorykiller/parameters/enable_adaptive_lmk
@@ -218,79 +233,75 @@ sync; # sync caches
 echo 3 > /proc/sys/vm/drop_caches # drop caches
 mem=$(cat /proc/meminfo | grep MemTotal | awk '{print $2}' );
 mb=$(( 1024*1024 ));
-if (( $mem < '3145728' )); then
-	echo 1 > /sys/block/zram0/reset
-	echo 0 > /sys/block/zram0/disksize
-	mkswap /dev/block/zram0 > /dev/null 2>&1
-	swapon /dev/block/zram0 > /dev/null 2>&1
-	echo zstd > /sys/block/zram0/comp_algorithm
-	echo lz4 > /sys/block/zram0/comp_algorithm
-	echo 4 > /sys/block/zram0/max_comp_streams
-	echo 8 > /sys/block/zram0/swappiness
-	zRamMem=$(( $mb * 1536 ));
-	echo "$zRamMem" > /sys/block/zram0/disksize
-	echo "27648,32256,55296,80640,100800,126336" > /sys/module/lowmemorykiller/parameters/minfree
-	echo 20 > /proc/sys/vm/swappiness
-	echo 20 > /proc/sys/vm/vfs_cache_pressure
-	echo 15 > /proc/sys/vm/dirty_ratio
-	echo 2 > /proc/sys/vm/dirty_background_ratio
-	echo 50 > /proc/sys/vm/overcommit_ratio
-	echo 4096 > /proc/sys/vm/min_free_kbytes
-elif (( $mem < '4194304' )); then
-	if [ -e /sys/block/zram0 ]; then
+if [ -e /sys/block/zram0 ]; then
+	if (( $mem < '3145728' )); then
 		echo 1 > /sys/block/zram0/reset
 		echo 0 > /sys/block/zram0/disksize
 		mkswap /dev/block/zram0 > /dev/null 2>&1
 		swapon /dev/block/zram0 > /dev/null 2>&1
-		echo zstd > /sys/block/zram0/comp_algorithm
 		echo lz4 > /sys/block/zram0/comp_algorithm
 		echo 4 > /sys/block/zram0/max_comp_streams
-		echo 8 > /sys/block/zram0/swappiness
+		zRamMem=$(( $mb * 1536 ));
+		echo "$zRamMem" > /sys/block/zram0/disksize
+		echo "27648,32256,55296,80640,100800,126336" > /sys/module/lowmemorykiller/parameters/minfree
+		echo 60 > /proc/sys/vm/swappiness
+		echo 30 > /proc/sys/vm/vfs_cache_pressure
+		echo 20 > /proc/sys/vm/dirty_ratio
+		echo 2 > /proc/sys/vm/dirty_background_ratio
+		echo 50 > /proc/sys/vm/overcommit_ratio
+		echo 4096 > /proc/sys/vm/min_free_kbytes
+	elif (( $mem < '4194304' )); then
+		echo 1 > /sys/block/zram0/reset
+		echo 0 > /sys/block/zram0/disksize
+		mkswap /dev/block/zram0 > /dev/null 2>&1
+		swapon /dev/block/zram0 > /dev/null 2>&1
+		echo lz4 > /sys/block/zram0/comp_algorithm
+		echo 8 > /sys/block/zram0/max_comp_streams
 		zRamMem=$(( $mb * 1024 ));
 		echo "$mem"
 		echo "$mb"
 		echo "$zRamMem"
 		echo "$zRamMem" > /sys/block/zram0/disksize
-	fi
-		echo "23040,27648,32256,55296,80640,100800" > /sys/module/lowmemorykiller/parameters/minfree
-		echo 8 > /proc/sys/vm/swappiness
-		echo 70 > /proc/sys/vm/vfs_cache_pressure
-		echo 20 > /proc/sys/vm/dirty_ratio
+		echo "27648,41472,48384,72192,84224,121856" > /sys/module/lowmemorykiller/parameters/minfree
+		echo 20 > /proc/sys/vm/swappiness
+		echo 50 > /proc/sys/vm/vfs_cache_pressure
+		echo 30 > /proc/sys/vm/dirty_ratio
 		echo 2 > /proc/sys/vm/dirty_background_ratio
-		echo 50 > /proc/sys/vm/overcommit_ratio
-		echo 7168  > /proc/sys/vm/min_free_kbytes
-elif (( $mem < '6291456' )); then
-	if [ -e /sys/block/zram0 ]; then
+		echo 60 > /proc/sys/vm/overcommit_ratio
+		echo 7542  > /proc/sys/vm/min_free_kbytes
+	elif (( $mem < '6291456' )); then
 		echo 1 > /sys/block/zram0/reset
 		echo 0 > /sys/block/zram0/disksize
 		mkswap /dev/block/zram0 > /dev/null 2>&1
 		swapon /dev/block/zram0 > /dev/null 2>&1
-		echo zstd > /sys/block/zram0/comp_algorithm
 		echo lz4 > /sys/block/zram0/comp_algorithm
 		echo 4 > /sys/block/zram0/max_comp_streams
 		echo 8 > /sys/block/zram0/swappiness
 		zRamMem=$(( $mb * 512 ));
 		echo "$zRamMem" > /sys/block/zram0/disksize
-	fi
+		echo "18432,23040,27648,32256,55296,80640" > /sys/module/lowmemorykiller/parameters/minfree
+		echo 8 > /proc/sys/vm/swappiness
+		echo 80 > /proc/sys/vm/vfs_cache_pressure
+		echo 30 > /proc/sys/vm/dirty_ratio
+		echo 5 > /proc/sys/vm/dirty_background_ratio
+		echo 70 > /proc/sys/vm/overcommit_ratio
+		echo 7556 > /proc/sys/vm/min_free_kbytes		
+	else
+		swapoff /dev/block/zram0 > /dev/null 2>&1
+		echo 1 > /sys/block/zram0/reset
+		echo 0 > /sys/block/zram0/disksize
 		echo "18432,23040,27648,32256,55296,80640" > /sys/module/lowmemorykiller/parameters/minfree
 		echo 5 > /proc/sys/vm/swappiness
-		echo 90 > /proc/sys/vm/vfs_cache_pressure
-		echo 20 > /proc/sys/vm/dirty_ratio
-		echo 2 > /proc/sys/vm/dirty_background_ratio
-		echo 50 > /proc/sys/vm/overcommit_ratio
-		echo 7542 > /proc/sys/vm/min_free_kbytes		
-else
-	swapoff /dev/block/zram0 > /dev/null 2>&1
-	echo 1 > /sys/block/zram0/reset
-	echo 0 > /sys/block/zram0/disksize
-	echo "18432,23040,27648,32256,52640,76160" > /sys/module/lowmemorykiller/parameters/minfree
-	echo 5 > /proc/sys/vm/swappiness
-	echo 100 > /proc/sys/vm/vfs_cache_pressure
-	echo 50 > /proc/sys/vm/dirty_ratio
-	echo 5 > /proc/sys/vm/dirty_background_ratio
-	echo 80 > /proc/sys/vm/overcommit_ratio
-	echo 11088 > /proc/sys/vm/min_free_kbytes
+		echo 100 > /proc/sys/vm/vfs_cache_pressure
+		echo 50 > /proc/sys/vm/dirty_ratio
+		echo 10 > /proc/sys/vm/dirty_background_ratio
+		echo 80 > /proc/sys/vm/overcommit_ratio
+		echo 11088 > /proc/sys/vm/min_free_kbytes
+	fi
 fi
+echo 0 > /sys/module/lowmemorykiller/parameters/debug_level
+sync;
+echo 0 > /proc/sys/vm/drop_caches; # reset normal caching
 echo 0 > /sys/module/lowmemorykiller/parameters/debug_level
 echo 0 > /proc/sys/vm/drop_caches; # reset normal caching
 
